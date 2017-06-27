@@ -6,6 +6,7 @@ http://www.instructables.com/id/The-Cat-Has-Left-the-Building-ESP8266-PIR-Monito
 https://github.com/rgrokett/ESP8266_PIR
 
 This version is only needed if you wish to run the unit using AA batteries. 
+After 4 months and hundreds of triggers, still running strong on the same set of batteries. 
 
 We just installed a Cat Door in our garage and I wanted to see how many times per day (actually night) our cat went in and out the door. We could tell the cat was using the door as we would find it outside sometimes and inside sometimes. 
 So, breaking out my parts box, I found a PIR motion sensor and ESP8266. 
