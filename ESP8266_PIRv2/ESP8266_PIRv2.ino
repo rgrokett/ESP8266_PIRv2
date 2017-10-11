@@ -13,7 +13,7 @@
  *  $ openssl s_client -servername maker.ifttt.com -connect maker.ifttt.com:443 | openssl x509 -fingerprint -noout
  *  (Replace colons with spaces in result)
  *  
- *  Create a IFTTT Recipe using the Maker Channel to trigger a Send Email or Send SMS Action.
+ *  Create a IFTTT Recipe using the Webhooks Channel to trigger a Send Email or Send SMS Action.
  *  
  *  HTTPSRedirect is available from GitHub at:
  *  https://github.com/electronicsguy/ESP8266/tree/master/HTTPSRedirect
@@ -62,53 +62,6 @@ int MOTION_DELAY = 15; // Delay in seconds between events to keep from flooding 
 
 
 //////////////////////////////////
-// CONNECT TO WIFI AND SEND MESSAGE
-void setup() {
-  Serial.begin(115200);
-  delay(10);
-
-  // prepare onboard LED
-  pinMode(LED, OUTPUT);
-  digitalWrite(LED, HIGH);  
-  
-  // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
-  // Set Static IP, if defined above
-  #if defined(IP)
-      WiFi.config(ip, gateway, subnet);
-  #endif
-
-  WiFi.begin(ssid, password);
-  
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected");  
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-
-  // Blink onboard LED to signify its connected
-  blink();
-  blink();
-  blink();
-  blink(); 
-
-  // Send a Message to IFTTT
-  sendEvent(); 
-
-  // Sleep until PIR motion detection
-  // See diagram for PIR wiring
-  ESP.deepSleep(0);
-  
-}
-
-
 // SEND HTTPS GET TO IFTTT
 void sendEvent()
 {
@@ -161,6 +114,53 @@ void blink() {
   delay(100); 
   digitalWrite(LED, HIGH);
   delay(100);
+}
+
+
+// CONNECT TO WIFI AND SEND MESSAGE
+void setup() {
+  Serial.begin(115200);
+  delay(10);
+
+  // prepare onboard LED
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, HIGH);  
+  
+  // We start by connecting to a WiFi network
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  // Set Static IP, if defined above
+  #if defined(IP)
+      WiFi.config(ip, gateway, subnet);
+  #endif
+
+  WiFi.begin(ssid, password);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");  
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  // Blink onboard LED to signify its connected
+  blink();
+  blink();
+  blink();
+  blink(); 
+
+  // Send a Message to IFTTT
+  sendEvent(); 
+
+  // Sleep until PIR motion detection
+  // See diagram for PIR wiring
+  ESP.deepSleep(0);
+  
 }
 
 
