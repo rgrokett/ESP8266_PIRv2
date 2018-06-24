@@ -8,6 +8,9 @@ https://github.com/rgrokett/ESP8266_PIR
 This version is only needed if you wish to run the unit using AA batteries. 
 After 4 months and hundreds of triggers, still running strong on the same set of batteries. 
 
+2018-06-24 - Updated HTTPSRedirect Library from
+https://github.com/electronicsguy/ESP8266/tree/master/HTTPSRedirect
+
 We just installed a Cat Door in our garage and I wanted to see how many times per day (actually night) our cat went in and out the door. We could tell the cat was using the door as we would find it outside sometimes and inside sometimes. 
 So, breaking out my parts box, I found a PIR motion sensor and ESP8266. 
 
