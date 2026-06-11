@@ -1,86 +1,70 @@
-/*  HTTPS on ESP8266 with follow redirects, chunked encoding support
- *  Version 2.1
- *  Author: Sujay Phadke
- *  Github: @electronicsguy
- *  Copyright (C) 2017 Sujay Phadke <electronicsguy123@gmail.com>
- *  All rights reserved.
- *
+/*
+ * HTTPS client with bounded redirect handling and chunked response support.
+ * Based on HTTPSRedirect 2.1 by Sujay Phadke.
  */
+
 #pragma once
+
 #include <WiFiClientSecure.h>
 
-// Un-comment for extra functionality
-//#define EXTRA_FNS
-#define OPTIMIZE_SPEED
-
 class HTTPSRedirect : public WiFiClientSecure {
-  private:
-    const int _httpsPort;
-    bool _keepAlive;
-    String _redirUrl;
-    String _redirHost;
-    unsigned int _maxRedirects;  // to-do
-    const char* _contentTypeHeader;
-    
-    struct headerFields{
-      String transferEncoding;
-      unsigned int contentLength;
-      #ifdef EXTRA_FNS
-      String contentType;
-      #endif
-    };
+ private:
+  struct HeaderFields {
+    String transferEncoding;
+    size_t contentLength;
+    bool hasContentLength;
+  };
 
-    headerFields _hF;
-    
-    String _Request;
+  struct Response {
+    int statusCode;
+    String reasonPhrase;
+    bool redirected;
+    String body;
+  };
 
-    struct Response{
-      int statusCode;
-      String reasonPhrase;
-      bool redirected;
-      String body;
-    };
+  const uint16_t _httpsPort;
+  bool _keepAlive;
+  String _redirectUrl;
+  String _redirectHost;
+  unsigned int _maxRedirects;
+  const char* _contentTypeHeader;
+  HeaderFields _headers;
+  String _request;
+  Response _response;
+  bool _printResponseBody;
 
-    Response _myResponse;
-    bool _printResponseBody;
+  void initialize();
+  void initializeResponse();
+  bool sendRequest();
+  bool readHeaders(String* location);
+  bool parseLocation(const String& location);
+  bool readBody();
+  bool readFixedBody(size_t length);
+  bool readChunkedBody();
+  bool readUntilClose();
+  int readResponseStatus();
+  void appendBody(const char* data, size_t length);
+  void createGetRequest(const String& url, const char* host);
+  void createPostRequest(const String& url, const char* host,
+                         const String& payload);
 
-    void Init(void);
-    bool printRedir(void);    
-    void fetchHeader(void);
-    bool getLocationURL(void);
-    void fetchBodyUnChunked(unsigned);
-    void fetchBodyChunked(void);
-    unsigned int getResponseStatus(void);
-    void InitResponse(void);
-    void createGetRequest(const String&, const char*);
-    void createPostRequest(const String&, const char*, const String&);
-    
-#ifdef EXTRA_FNS
-    void fetchBodyRaw(void);
-    void printHeaderFields(void);
-#endif
+ public:
+  HTTPSRedirect();
+  explicit HTTPSRedirect(uint16_t port);
+  ~HTTPSRedirect();
 
-  public:
+  bool GET(const String& url, const char* host);
+  bool GET(const String& url, const char* host, const bool& displayBody);
+  bool POST(const String& url, const char* host, const String& payload);
+  bool POST(const String& url, const char* host, const String& payload,
+            const bool& displayBody);
 
-    HTTPSRedirect(void);
-    HTTPSRedirect(const int);
-    ~HTTPSRedirect();
+  int getStatusCode() const;
+  String getReasonPhrase() const;
+  String getResponseBody() const;
 
-    bool GET(const String&, const char*);
-    bool GET(const String&, const char*, const bool&);
-    bool POST(const String&, const char*, const String&);
-    bool POST(const String&, const char*, const String&, const bool&);
-
-    int getStatusCode(void);
-    String getReasonPhrase(void);
-    String getResponseBody(void);
-    
-    void setPrintResponseBody(bool);
-    void setMaxRedirects(const unsigned int);
-    
-    void setContentTypeHeader(const char *);
-#ifdef OPTIMIZE_SPEED
-    bool reConnectFinalEndpoint(void);
-#endif
-
+  void setPrintResponseBody(bool display);
+  void setMaxRedirects(unsigned int count);
+  void setContentTypeHeader(const char* type);
+  bool reConnectFinalEndpoint();
 };
